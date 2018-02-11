@@ -1,9 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 int main(int argc, char *argv[]) {
-	clock_t start_time = clock();
+	//For real time
+	struct timespec start_rt, end_rt;
+	//Start real time
+	clock_gettime(CLOCK_REALTIME, &start_rt);
+	//For CPU time in user and system mode
+	struct rusage usage;
+	struct timeval systime_start, systime_end;
+	struct timeval usrtime_start, usrtime_end;
+	
+	//Getting current usage
+	getrusage(RUSAGE_SELF, &usage);
+	//Start time system and user mode
+	systime_start = usage.ru_stime;
+	usrtime_start = usage.ru_utime;
 	
 	if(argc != 3) {
 		printf("Invalid no. of arguments! Usage: %s <n1> <n2>\n", argv[0]);
@@ -32,11 +47,18 @@ int main(int argc, char *argv[]) {
 		printf("i: %4d\tval: %4d\n", i, gen_num);
 	}
 
-	clock_t end_time = clock();
+	//End of real time
+	clock_gettime(CLOCK_REALTIME, &end_rt);
+	
+	//Getting current usage
+	getrusage(RUSAGE_SELF, &usage);
+	//End time system and user mode
+	systime_end = usage.ru_stime;
+	usrtime_end = usage.ru_utime;
 
-	//Clocks part taken from @xRuiAlves
-
-	printf("Program run time: %lf\n", (double) (end_time - start_time) / CLOCKS_PER_SEC);
+	printf("Real time elapsed (ms): %f\n", (end_rt.tv_sec - start_rt.tv_sec) * 1000.0 + (end_rt.tv_nsec - start_rt.tv_nsec) / 1000000.0);
+	printf("CPU time in system mode (ms): %f\n", (systime_end.tv_sec - systime_start.tv_sec) * 1000.0 + (systime_end.tv_usec - systime_start.tv_usec) / 1000.0);
+	printf("CPU time in user mode (ms): %f\n", (usrtime_end.tv_sec - usrtime_start.tv_sec) * 1000.0 + (usrtime_end.tv_usec - usrtime_start.tv_usec) / 1000.0);
 
 	return 0;
 }
