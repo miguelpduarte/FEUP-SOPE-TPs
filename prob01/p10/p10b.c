@@ -26,6 +26,10 @@ int main() {
 		return 1;
 	}
 	
+	//BIG NOTE FOR THE FUTURE:
+	//strtok does not allocate new strings, it returns a pointer to a section of the original string (thus, it mangles up the original string)
+	//keep this in mind because freeing the base original string would cause all the other strings to be dangling pointers, causing potential segfaults
+
 	command_arr[arr_length] = current_str;
 	arr_length++;
 
@@ -34,9 +38,12 @@ int main() {
 		arr_length++;
 	}
 
+	printf("Split command parts:\n");
+
 	int i;
 	for(i = 0; i < arr_length; ++i) {
-		printf("%s ", command_arr[i]);
+		//a newline was used instead of a space for printing for easier verification
+		printf("%s\n", command_arr[i]);
 	}
 
 	return 0;

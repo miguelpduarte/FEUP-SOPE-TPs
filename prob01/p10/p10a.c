@@ -19,6 +19,10 @@ int main() {
 		return 0;
 	}
 	
+	//BIG NOTE FOR THE FUTURE:
+	//strtok does not allocate new strings, it returns a pointer to a section of the original string (thus, it mangles up the original string)
+	//keep this in mind because freeing the base original string would cause all the other strings to be dangling pointers, causing potential segfaults
+
 	printf("%s", current_str);
 
 	while((current_str = strtok_r(NULL, " ", &save_ptr)) != NULL) {
